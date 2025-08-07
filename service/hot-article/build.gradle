@@ -1,0 +1,4 @@
+// 여기에서 이제 아티클 서비스에서만 사용을 할 수 있는 dependency를 설정할 수 있다.
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+}
