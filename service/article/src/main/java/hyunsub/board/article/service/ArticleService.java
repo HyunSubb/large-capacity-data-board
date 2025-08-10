@@ -4,6 +4,7 @@ import hyunsub.board.article.entity.Article;
 import hyunsub.board.article.repository.ArticleRepository;
 import hyunsub.board.article.service.request.ArticleCreateRequest;
 import hyunsub.board.article.service.request.ArticleUpdateRequest;
+import hyunsub.board.article.service.response.ArticlePageResponse;
 import hyunsub.board.article.service.response.ArticleResponse;
 import kuke.board.common.snowflake.Snowflake;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +43,21 @@ public class ArticleService {
     @Transactional
     public void delete(Long articleId) {
         articleRepository.deleteById(articleId);
+    }
+
+    public ArticlePageResponse readAll(Long boardId, Long page, Long pageSize) {
+        return ArticlePageResponse.of(
+                // boardId (게시판 번호), (page - 1) * pageSize (offset 계산 공식), pageSize (페이지 당 게시글 개수)
+                articleRepository.findAll(boardId, (page - 1) * pageSize, pageSize).stream()
+                        .map(ArticleResponse::from)
+                        .toList(),
+                articleRepository.count(
+                        boardId,
+                        // 현재 페이지 (page), 페이지 당 게시글 수 (pageSize),
+                        // 이동 가능한 페이지의 개수(ex : 1~10 페이지를 이동 가능)
+                        // 다음 버튼 유무 확인을 위한 메서드
+                        PageLimitCalculator.calculatePageLimit(page, pageSize, 10L)
+                )
+        );
     }
 }

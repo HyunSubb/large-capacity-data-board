@@ -23,8 +23,6 @@ public class DataInitializer {
     // 트랜잭션을 프로그래밍 방식으로 관리
     /*
         TransactionTemplate: 트랜잭션을 프로그래밍 방식으로 관리하는 Spring의 유틸리티 클래스입니다.
-        transactionTemplate.executeWithoutResult는 하나의 트랜잭션으로 묶어 내부 코드를 실행하며,
-        모든 작업이 성공적으로 완료되면 커밋하고, 오류 발생 시 롤백합니다.
      */
     @Autowired
     TransactionTemplate transactionTemplate;
@@ -93,8 +91,13 @@ public class DataInitializer {
     }
 
     // 데이터 삽입 메서드
+    // insert() 한 번당 2000건의 데이터 삽입
     void insert() {
         // 하나의 트랜잭션으로 묶어서 실행
+        /*
+            transactionTemplate.executeWithoutResult는 하나의 트랜잭션으로 묶어 내부 코드를 실행하며,
+            모든 작업이 성공적으로 완료되면 커밋하고, 오류 발생 시 롤백합니다.
+         */
         transactionTemplate.executeWithoutResult(status -> {
             // BULK_INSERT_SIZE(2000)만큼 반복하며 Article 엔티티 생성
             for(int i = 0; i < BULK_INSERT_SIZE; i++) {

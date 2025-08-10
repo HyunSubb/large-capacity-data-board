@@ -2,6 +2,7 @@ package hyunsub.board.article.api;
 
 import hyunsub.board.article.service.request.ArticleCreateRequest;
 import hyunsub.board.article.service.request.ArticleUpdateRequest;
+import hyunsub.board.article.service.response.ArticlePageResponse;
 import hyunsub.board.article.service.response.ArticleResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
@@ -64,5 +65,20 @@ public class ArticleApiTest {
                 .uri("/v1/articles/{articleId}", articleId)
                 .retrieve()
                 .body(ArticleResponse.class);
+    }
+
+    @Test
+    void readAllTest() {
+        ArticlePageResponse response = restClient.get()
+                // 1번 게시판에서 1페이지에 30개의 게시글을 조회
+//                .uri("/v1/articles?boardId=1&page=1&pageSize=30")
+                .uri("/v1/articles?boardId=1&page=50000&pageSize=30")
+                .retrieve()
+                .body(ArticlePageResponse.class);
+
+        System.out.println("response = " + response);
+        for(ArticleResponse article : response.getArticles()) {
+            System.out.println("article = " + article);
+        }
     }
 }
