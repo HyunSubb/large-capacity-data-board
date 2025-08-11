@@ -1,6 +1,7 @@
 package hyunsub.board.comment.api;
 
 import hyunsub.board.comment.service.request.CommentCreateRequest;
+import hyunsub.board.comment.service.response.CommentPageResponse;
 import hyunsub.board.comment.service.response.CommentResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
@@ -57,5 +58,21 @@ public class CommentApiTest {
                 .uri("/v1/comments/{commentId}", 213194361419272192L)
                 .retrieve()
                 .toBodilessEntity(); // retrieve 만 호출하면 서버로 api 호출이 제대로 안되서 추가해줌.
+    }
+
+    @Test
+    void readAll() {
+        CommentPageResponse response = restClient.get()
+                .uri("/v1/comments?articleId=1&page=40000&pageSize=16")
+                .retrieve()
+                .body(CommentPageResponse.class);
+
+        System.out.println("response.getCommentCount() = " + response.getCommentCount());
+        for(CommentResponse comment : response.getComments()) {
+            if(!comment.getCommentId().equals(comment.getParentCommentId())) {
+                System.out.print("\t");
+            }
+            System.out.println("comment.getCommentId(), comment.getContent() = " + comment.getCommentId() + ", " + comment.getContent());
+        }
     }
 }

@@ -55,7 +55,7 @@ public class ArticleService {
                         boardId,
                         // 현재 페이지 (page), 페이지 당 게시글 수 (pageSize),
                         // 이동 가능한 페이지의 개수(ex : 1~10 페이지를 이동 가능)
-                        // 다음 버튼 유무 확인을 위한 메서드
+                        // 다음 버튼 유무 확인을 위한 메서드 + 현재 페이지기준으로 가져올 게시글의 수 집계 메서드
                         PageLimitCalculator.calculatePageLimit(page, pageSize, 10L)
                 )
         );

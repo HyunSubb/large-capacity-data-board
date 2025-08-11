@@ -2,6 +2,7 @@ package hyunsub.board.comment.controller;
 
 import hyunsub.board.comment.service.CommentService;
 import hyunsub.board.comment.service.request.CommentCreateRequest;
+import hyunsub.board.comment.service.response.CommentPageResponse;
 import hyunsub.board.comment.service.response.CommentResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,4 +33,12 @@ public class CommentController {
         commentService.delete(commentId);
     }
 
+    @GetMapping("/v1/comments")
+    public CommentPageResponse readAll(
+            @RequestParam("articleId") Long articleId,
+            @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize
+    ) {
+        return commentService.readAll(articleId, page, pageSize);
+    }
 }

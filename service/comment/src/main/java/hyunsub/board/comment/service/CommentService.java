@@ -3,6 +3,7 @@ package hyunsub.board.comment.service;
 import hyunsub.board.comment.entity.Comment;
 import hyunsub.board.comment.repository.CommentRepository;
 import hyunsub.board.comment.service.request.CommentCreateRequest;
+import hyunsub.board.comment.service.response.CommentPageResponse;
 import hyunsub.board.comment.service.response.CommentResponse;
 import kuke.board.common.snowflake.Snowflake;
 import org.springframework.stereotype.Service;
@@ -87,5 +88,18 @@ public class CommentService {
                     .ifPresent(parentComment -> delete(parentComment));
         }
     }
+
+    /*
+        페이지 번호 기준 / 무한 스크롤 X
+     */
+    public CommentPageResponse readAll(Long articleId, Long page, Long pageSize) {
+        return CommentPageResponse.of(
+                commentRepository.findAll(articleId, (page - 1) * pageSize, pageSize)
+                        .stream().map(CommentResponse::from)
+                        .toList(),
+                commentRepository.count(articleId, PageLimitCalculator.calculatePageLimit(page, pageSize, 10L))
+        );
+    }
+
 
 }
