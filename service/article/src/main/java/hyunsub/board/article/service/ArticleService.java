@@ -1,7 +1,9 @@
 package hyunsub.board.article.service;
 
 import hyunsub.board.article.entity.Article;
+import hyunsub.board.article.entity.BoardArticleCount;
 import hyunsub.board.article.repository.ArticleRepository;
+import hyunsub.board.article.repository.BoardArticleCountRepository;
 import hyunsub.board.article.service.request.ArticleCreateRequest;
 import hyunsub.board.article.service.request.ArticleUpdateRequest;
 import hyunsub.board.article.service.response.ArticlePageResponse;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleService {
     private final Snowflake snowflake = new Snowflake();
     private final ArticleRepository articleRepository;
+    private final BoardArticleCountRepository boardArticleCountService;
 
     @Transactional
     public ArticleResponse create(ArticleCreateRequest request) {
@@ -25,6 +28,12 @@ public class ArticleService {
                         request.getContent(),
                         request.getBoardId(),
                         request.getWriterId()));
+        int result = boardArticleCountService.increase(request.getBoardId());
+        if(result == 0) {
+            boardArticleCountService.save(
+                    BoardArticleCount.init(request.getBoardId(), 1L)
+            );
+        }
         return ArticleResponse.from(article);
     }
 
@@ -42,7 +51,9 @@ public class ArticleService {
 
     @Transactional
     public void delete(Long articleId) {
-        articleRepository.deleteById(articleId);
+        Article article = articleRepository.findById(articleId).orElseThrow();
+        articleRepository.delete(article);
+        boardArticleCountService.decrease(article.getBoardId());
     }
 
     public ArticlePageResponse readAll(Long boardId, Long page, Long pageSize) {
@@ -59,5 +70,11 @@ public class ArticleService {
                         PageLimitCalculator.calculatePageLimit(page, pageSize, 10L)
                 )
         );
+    }
+
+    public Long count(Long boardId) {
+        return boardArticleCountService.findById(boardId)
+                .map(boardArticleCount -> boardArticleCount.getArticleCount())
+                .orElse(0L);
     }
 }

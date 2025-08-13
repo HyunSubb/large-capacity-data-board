@@ -81,4 +81,17 @@ public class ArticleApiTest {
             System.out.println("article = " + article);
         }
     }
+
+    @Test
+    void countTest() {
+        ArticleResponse response = create(
+                new ArticleCreateRequest("h1", "content", 2L, 2L));
+
+        Long count = restClient.get()
+                .uri("/v1/articles/boards/{boardId}/count", 2L)
+                .retrieve()
+                .body(Long.class);
+
+        System.out.println("count = " + count);
+    }
 }
