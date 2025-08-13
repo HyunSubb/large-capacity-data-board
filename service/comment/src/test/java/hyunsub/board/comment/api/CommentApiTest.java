@@ -75,4 +75,17 @@ public class CommentApiTest {
             System.out.println("comment.getCommentId(), comment.getContent() = " + comment.getCommentId() + ", " + comment.getContent());
         }
     }
+
+    @Test
+    void count() {
+        CommentResponse commentResponse = createComment(
+                new CommentCreateRequest(2L, "my content2" , null, 1L));
+
+        Long count1 = restClient.get()
+                .uri("/v1/comments/articles/{articleId}/count", 2L)
+                .retrieve()
+                .body(Long.class);
+
+        System.out.println("count1 = " + count1);
+    }
 }

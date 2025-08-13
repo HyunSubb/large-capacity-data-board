@@ -1,6 +1,8 @@
 package hyunsub.board.comment.service;
 
+import hyunsub.board.comment.entity.ArticleCommentCount;
 import hyunsub.board.comment.entity.Comment;
+import hyunsub.board.comment.repository.ArticleCommentCountRepository;
 import hyunsub.board.comment.repository.CommentRepository;
 import hyunsub.board.comment.service.request.CommentCreateRequest;
 import hyunsub.board.comment.service.response.CommentPageResponse;
@@ -15,9 +17,11 @@ import static java.util.function.Predicate.not;
 public class CommentService {
     private final Snowflake snowflake = new Snowflake();
     private final CommentRepository commentRepository;
+    private final ArticleCommentCountRepository articleCommentCountRepository;
 
-    public CommentService(CommentRepository commentRepository) {
+    public CommentService(CommentRepository commentRepository, ArticleCommentCountRepository articleCommentCountRepository) {
         this.commentRepository = commentRepository;
+        this.articleCommentCountRepository = articleCommentCountRepository;
     }
 
     // 생성
@@ -33,6 +37,14 @@ public class CommentService {
                         request.getWriterId()
                 )
         );
+
+        int result = articleCommentCountRepository.increase(request.getArticleId());
+        if(result == 0) {
+            articleCommentCountRepository.save(
+                    ArticleCommentCount.init(request.getArticleId(), 1L)
+            );
+        }
+
         return CommentResponse.from(comment);
     }
 
@@ -78,6 +90,7 @@ public class CommentService {
 
     private void delete(Comment comment) {
         commentRepository.delete(comment);
+        articleCommentCountRepository.decrease(comment.getArticleId());
         if (!comment.isRoot()) {
             commentRepository.findById(comment.getParentCommentId())
 //                    .filter(Comment::getDeleted) // 부모 댓글이 삭제가 되어졌는 지 확인
@@ -101,5 +114,9 @@ public class CommentService {
         );
     }
 
-
+    public Long count(Long articleId) {
+        return articleCommentCountRepository.findById(articleId)
+                .map(articleCommentCount -> articleCommentCount.getCommentCount())
+                .orElse(0L);
+    }
 }
