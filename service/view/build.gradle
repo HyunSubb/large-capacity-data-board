@@ -1,4 +1,9 @@
 // 여기에서 이제 아티클 서비스에서만 사용을 할 수 있는 dependency를 설정할 수 있다.
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    // 이렇게 프로젝트라는 명령어를 사용하면은 다른 모듈에 있는 걸 가져올 수 있다.
+    implementation project(':common:snowflake')
 }
