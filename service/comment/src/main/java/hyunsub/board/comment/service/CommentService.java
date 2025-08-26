@@ -90,6 +90,7 @@ public class CommentService {
 
     private void delete(Comment comment) {
         commentRepository.delete(comment);
+        // 실제 물리적으로 삭제가 될 때 댓글의 개수를 감소시키자.
         articleCommentCountRepository.decrease(comment.getArticleId());
         if (!comment.isRoot()) {
             commentRepository.findById(comment.getParentCommentId())
