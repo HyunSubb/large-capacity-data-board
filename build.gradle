@@ -31,6 +31,8 @@ allprojects {
     }
 
     dependencies {
+        implementation 'ch.qos.logback:logback-classic'
+
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
         testAnnotationProcessor 'org.projectlombok:lombok' // 테스트 코드에 Lombok을 적용하기 위함
