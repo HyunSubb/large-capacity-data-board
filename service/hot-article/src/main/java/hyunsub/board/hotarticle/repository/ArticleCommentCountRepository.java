@@ -21,6 +21,7 @@ public class ArticleCommentCountRepository {
     private static final String KEY_FORMAT = "hot-article::article::%s::comment-count";
 
     public void createOrUpdate(Long articleId, Long commentCount, Duration ttl) {
+        // set(key, value, timeout)
         redisTemplate.opsForValue().set(generateKey(articleId), String.valueOf(commentCount), ttl);
     }
 

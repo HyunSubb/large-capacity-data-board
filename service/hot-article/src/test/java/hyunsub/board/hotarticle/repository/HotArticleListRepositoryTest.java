@@ -30,6 +30,12 @@ class HotArticleListRepositoryTest {
         hotArticleListRepository.add(4L, time, 5L, limit, Duration.ofSeconds(3));
         hotArticleListRepository.add(5L, time, 4L, limit, Duration.ofSeconds(3));
 
+//        hotArticleListRepository.add(1L, time, 2L, limit, Duration.ofSeconds(600));
+//        hotArticleListRepository.add(2L, time, 3L, limit, Duration.ofSeconds(600));
+//        hotArticleListRepository.add(3L, time, 1L, limit, Duration.ofSeconds(600));
+//        hotArticleListRepository.add(4L, time, 5L, limit, Duration.ofSeconds(600));
+//        hotArticleListRepository.add(5L, time, 4L, limit, Duration.ofSeconds(600));
+
         // then
         List<Long> articleIds = hotArticleListRepository.readAll("20240723");
 
@@ -43,5 +49,7 @@ class HotArticleListRepositoryTest {
         
         // 5초 뒤 다시 조회
         assertThat(hotArticleListRepository.readAll("20240723")).isEmpty();
+
+//        hotArticleListRepository.readAll("20240723");
     }
 }

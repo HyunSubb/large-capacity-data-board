@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public enum EventType {
     /*
-        메서드가 아니라 enum의 인스턴스, 상수들이다.
+        메서드가 아니라 enum에서 미리 정의된 인스턴스, 상수들이다.
      */
     ARTICLE_CREATED(ArticleCreatedEventPayload.class, Topic.KUKE_BOARD_ARTICLE),
     ARTICLE_UPDATED(ArticleUpdatedEventPayload.class, Topic.KUKE_BOARD_ARTICLE),
