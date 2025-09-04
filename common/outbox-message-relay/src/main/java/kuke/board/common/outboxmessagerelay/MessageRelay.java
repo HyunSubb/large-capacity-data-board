@@ -43,6 +43,7 @@ public class MessageRelay {
     private void publishEvent(Outbox outbox) {
         try {
             // 카프카로 메시지를 보내고, 1초 안에 전송이 완료될 때까지 기다립니다.
+            // messageRelayKafkaTemplate.send(topic, key, data)
             messageRelayKafkaTemplate.send(
                     outbox.getEventType().getTopic(),
                     String.valueOf(outbox.getShardKey()),

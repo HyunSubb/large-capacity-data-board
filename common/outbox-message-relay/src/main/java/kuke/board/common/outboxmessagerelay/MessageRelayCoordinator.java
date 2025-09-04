@@ -34,7 +34,7 @@ public class MessageRelayCoordinator {
     @Value("${spring.application.name}")
     private String applicationName;
 
-    // UUID로 생성된 고유한 애플리케이션 ID
+    // UUID로 생성된 고유한 애플리케이션 ID / 현재 실행중인 애플리케이션은 uuid로 생성
     private final String APP_ID = UUID.randomUUID().toString();
 
     // 핑을 3초마다 Redis에 보냅니다.

@@ -25,6 +25,7 @@ import java.util.concurrent.Executors;
 @ComponentScan("kuke.board.common.outboxmessagerelay")
 @EnableScheduling
 public class MessageRelayConfig {
+    // application.yml에서 Kafka 부트스트랩 서버 주소 주입
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
@@ -38,6 +39,7 @@ public class MessageRelayConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        // 모든 리플리카가 메시지 수신을 확인해야만 성공으로 처리
         configProps.put(ProducerConfig.ACKS_CONFIG, "all");
         return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configProps));
     }
@@ -51,10 +53,10 @@ public class MessageRelayConfig {
     @Bean
     public Executor messageRelayPublishEventExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(20);
-        executor.setMaxPoolSize(50);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("mr-pub-event-");
+        executor.setCorePoolSize(20); // 기본 스레드 수
+        executor.setMaxPoolSize(50); // 최대 스레드 수
+        executor.setQueueCapacity(100); // 큐 용량
+        executor.setThreadNamePrefix("mr-pub-event-"); // 스레드 이름 접두사
         return executor;
     }
 

@@ -7,10 +7,11 @@ import java.util.stream.LongStream;
 
 @Getter
 public class AssignedShard {
-    // 현재 인스턴스에 할당된 샤드 목록
+    // 현재 인스턴스(애플리케이션)에 할당된 샤드 목록
     private List<Long> shards;
 
     public static AssignedShard of(String appId, List<String> appIds, long shardCount) {
+        // List<String> appIds < 현재 실행중인 애플리케이션의 목록들
         AssignedShard assignedShard = new AssignedShard();
         assignedShard.shards = assign(appId, appIds, shardCount);
         return assignedShard;
