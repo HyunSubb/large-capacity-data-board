@@ -5,7 +5,7 @@ import hyunsub.board.like.entity.ArticleLikeCount;
 import hyunsub.board.like.repository.ArticleLikeCountRepository;
 import hyunsub.board.like.repository.ArticleLikeRepository;
 import hyunsub.board.like.service.response.ArticleLikeResponse;
-import kuke.board.common.snowflake.Snowflake;
+import hyunsub.board.hyunsub.snowflake.Snowflake;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

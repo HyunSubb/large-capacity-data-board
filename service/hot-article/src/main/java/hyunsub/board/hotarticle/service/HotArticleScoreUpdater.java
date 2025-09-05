@@ -3,8 +3,8 @@ package hyunsub.board.hotarticle.service;
 import hyunsub.board.hotarticle.repository.ArticleCreatedTimeRepository;
 import hyunsub.board.hotarticle.repository.HotArticleListRepository;
 import hyunsub.board.hotarticle.service.eventhandler.EventHandler;
-import kuke.board.common.event.Event;
-import kuke.board.common.event.EventPayload;
+import hyunsub.board.hyunsub.event.Event;
+import hyunsub.board.hyunsub.event.EventPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

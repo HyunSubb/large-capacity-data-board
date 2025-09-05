@@ -1,7 +1,7 @@
 package hyunsub.board.hotarticle.service.eventhandler;
 
-import kuke.board.common.event.Event;
-import kuke.board.common.event.EventPayload;
+import hyunsub.board.hyunsub.event.Event;
+import hyunsub.board.hyunsub.event.EventPayload;
 
 public interface EventHandler<T extends EventPayload> {
     /*

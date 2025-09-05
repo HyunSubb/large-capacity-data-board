@@ -7,11 +7,9 @@ import hyunsub.board.comment.repository.CommentRepository;
 import hyunsub.board.comment.service.request.CommentCreateRequest;
 import hyunsub.board.comment.service.response.CommentPageResponse;
 import hyunsub.board.comment.service.response.CommentResponse;
-import kuke.board.common.snowflake.Snowflake;
+import hyunsub.board.hyunsub.snowflake.Snowflake;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static java.util.function.Predicate.not;
 
 @Service
 public class CommentService {

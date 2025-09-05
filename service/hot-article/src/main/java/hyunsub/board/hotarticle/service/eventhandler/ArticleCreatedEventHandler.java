@@ -2,9 +2,9 @@ package hyunsub.board.hotarticle.service.eventhandler;
 
 import hyunsub.board.hotarticle.repository.ArticleCreatedTimeRepository;
 import hyunsub.board.hotarticle.utils.TimeCalculatorUtils;
-import kuke.board.common.event.Event;
-import kuke.board.common.event.EventType;
-import kuke.board.common.event.payload.ArticleCreatedEventPayload;
+import hyunsub.board.hyunsub.event.Event;
+import hyunsub.board.hyunsub.event.EventType;
+import hyunsub.board.hyunsub.event.payload.ArticleCreatedEventPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
