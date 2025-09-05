@@ -39,7 +39,7 @@ public class MessageRelayConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        // 모든 리플리카가 메시지 수신을 확인해야만 성공으로 처리
+        // 모든 레플리카가 메시지 수신을 확인해야만 성공으로 처리
         configProps.put(ProducerConfig.ACKS_CONFIG, "all");
         return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configProps));
     }

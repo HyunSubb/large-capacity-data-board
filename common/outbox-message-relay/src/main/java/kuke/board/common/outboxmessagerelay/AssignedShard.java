@@ -25,7 +25,10 @@ public class AssignedShard {
             return List.of(); // 할당할 샤드가 없으면 빈 목록 반환
         }
 
-        // 전체 샤드 개수를 인스턴스 수로 나누어 각 인스턴스가 담당할 샤드 범위를 계산합니다.
+        // 전체 샤드 개수를 인스턴스 수로 나누어 각 인스턴스가 담당할 샤드 범위를 계산합니다. -> 모듈러 샤딩 원리를 따르고 있다고 gemini가 그랬음.
+        // shardCount / appIds.size(): 이 부분은 **각 인스턴스에 할당될 샤드의 기본 개수(몫)**를 계산합니다. (예: 샤드 64개 / 인스턴스 4대 = 16개)
+        // appIndex: 현재 인스턴스의 순서를 나타냅니다. (0번, 1번, 2번...)
+        // 이 두 값을 곱하면, 현재 인스턴스보다 앞에 있는 인스턴스들이 몇 개의 샤드를 담당했는지 총합을 구할 수 있다.
         long start = appIndex * shardCount / appIds.size();
         long end = (appIndex + 1) * shardCount / appIds.size() - 1;
 

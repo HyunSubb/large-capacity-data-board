@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
     MessageRelayCoordinator는 여러 대의 서버가 하나의 작업을 동시에 처리할 때
     서로 충돌하지 않고 자기 할당량만 책임지도록 역할을 분배해주는 조율자입니다.
     이를 통해 효율성을 높이고, 메시지가 중복으로 전송되는 문제를 원천적으로 방지합니다.
+    
+    - 살아있는 애플리케이션들을 추적하고 관리하는 클래스
  */
 @Component
 @RequiredArgsConstructor
@@ -54,7 +56,9 @@ public class MessageRelayCoordinator {
                 .toList();
     }
 
-    // 3초마다 Redis에 핑을 보내 자신의 생존을 알립니다.
+    // Coordinator는 자신을 실행한 애플리케이션의 식별자와 현재 시간으로, 중앙 저장소에 3초 간격으로 ping을 보낸다.
+    // 이를 통해 Coordinator는 실행 중인 애플리케이션 목록을 파악하고, 각 애플리케이션에 샤드를 적절히 분산한다.
+    // 중앙 저장소(Redis)는 마지막 ping을 받은 지 9초가 지났으면 애플리케이션이 종료되었다고 판단하고 목록에서 제거한다.
     @Scheduled(fixedDelay = PING_INTERVAL_SECONDS, timeUnit = TimeUnit.SECONDS)
     public void ping() {
         // Pipeline을 사용해 여러 Redis 명령어를 한 번에 보냅니다.

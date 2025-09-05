@@ -70,6 +70,7 @@ public class MessageRelay {
         log.info("[MessageRelay.publishPendingEvent] assignedShard size={}", assignedShard.getShards().size());
         // 할당된 샤드에 대해 DB에서 10초 이상 남아있는 메시지를 조회하여 재전송을 시도합니다.
         for (Long shard : assignedShard.getShards()) {
+            // 현재 애플리케이션에 부여된 샤드들에게서 폴링을하고 있음
             List<Outbox> outboxes = outboxRepository.findAllByShardKeyAndCreatedAtLessThanEqualOrderByCreatedAtAsc(
                     shard,
                     LocalDateTime.now().minusSeconds(10), // 생성된 지 10초 지난 이벤트
