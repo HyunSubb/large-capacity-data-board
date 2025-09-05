@@ -7,20 +7,22 @@ import hyunsub.board.comment.repository.CommentRepository;
 import hyunsub.board.comment.service.request.CommentCreateRequest;
 import hyunsub.board.comment.service.response.CommentPageResponse;
 import hyunsub.board.comment.service.response.CommentResponse;
+import hyunsub.board.hyunsub.event.EventType;
+import hyunsub.board.hyunsub.event.payload.CommentCreatedEventPayload;
+import hyunsub.board.hyunsub.event.payload.CommentDeletedEventPayload;
+import hyunsub.board.hyunsub.outboxmessagerelay.OutboxEventPublisher;
 import hyunsub.board.hyunsub.snowflake.Snowflake;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class CommentService {
     private final Snowflake snowflake = new Snowflake();
     private final CommentRepository commentRepository;
+    private final OutboxEventPublisher outboxEventPublisher;
     private final ArticleCommentCountRepository articleCommentCountRepository;
-
-    public CommentService(CommentRepository commentRepository, ArticleCommentCountRepository articleCommentCountRepository) {
-        this.commentRepository = commentRepository;
-        this.articleCommentCountRepository = articleCommentCountRepository;
-    }
 
     // 생성
     @Transactional
@@ -42,6 +44,20 @@ public class CommentService {
                     ArticleCommentCount.init(request.getArticleId(), 1L)
             );
         }
+
+        outboxEventPublisher.publish(
+                EventType.COMMENT_CREATED,
+                CommentCreatedEventPayload.builder()
+                        .commentId(comment.getCommentId())
+                        .content(comment.getContent())
+                        .articleId(comment.getArticleId())
+                        .writerId(comment.getWriterId())
+                        .deleted(comment.getDeleted())
+                        .createdAt(comment.getCreatedAt())
+                        .articleCommentCount(count(comment.getArticleId()))
+                        .build(),
+                comment.getArticleId()
+        );
 
         return CommentResponse.from(comment);
     }
@@ -78,6 +94,20 @@ public class CommentService {
                     } else {
                         delete(comment);
                     }
+
+                    outboxEventPublisher.publish(
+                            EventType.COMMENT_DELETED,
+                            CommentDeletedEventPayload.builder()
+                                    .commentId(comment.getCommentId())
+                                    .content(comment.getContent())
+                                    .articleId(comment.getArticleId())
+                                    .writerId(comment.getWriterId())
+                                    .deleted(comment.getDeleted())
+                                    .createdAt(comment.getCreatedAt())
+                                    .articleCommentCount(count(comment.getArticleId()))
+                                    .build(),
+                            comment.getArticleId()
+                    );
                 });
     }
 

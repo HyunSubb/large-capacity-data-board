@@ -1,24 +1,26 @@
 package hyunsub.board.like.service;
 
+import hyunsub.board.hyunsub.event.EventType;
+import hyunsub.board.hyunsub.event.payload.ArticleLikedEventPayload;
+import hyunsub.board.hyunsub.event.payload.ArticleUnlikedEventPayload;
+import hyunsub.board.hyunsub.outboxmessagerelay.OutboxEventPublisher;
 import hyunsub.board.like.entity.ArticleLike;
 import hyunsub.board.like.entity.ArticleLikeCount;
 import hyunsub.board.like.repository.ArticleLikeCountRepository;
 import hyunsub.board.like.repository.ArticleLikeRepository;
 import hyunsub.board.like.service.response.ArticleLikeResponse;
 import hyunsub.board.hyunsub.snowflake.Snowflake;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class ArticleLikeService {
     private final Snowflake snowflake = new Snowflake();
+    private final OutboxEventPublisher outboxEventPublisher;
     private final ArticleLikeRepository articleLikeRepository;
     private final ArticleLikeCountRepository articleLikeCountRepository;
-
-    public ArticleLikeService(ArticleLikeRepository articleLikeRepository, ArticleLikeCountRepository articleLikeCountRepository) {
-        this.articleLikeRepository = articleLikeRepository;
-        this.articleLikeCountRepository = articleLikeCountRepository;
-    }
 
     public ArticleLikeResponse read(Long articleId, Long userId) {
         return articleLikeRepository.findByArticleIdAndUserId(articleId, userId)
@@ -44,7 +46,7 @@ public class ArticleLikeService {
      */
     @Transactional
     public void likePessimistickLock1(Long articleId, Long userId) {
-        articleLikeRepository.save(
+        ArticleLike articleLike = articleLikeRepository.save(
                 ArticleLike.create(snowflake.nextId(), articleId, userId));
 
         int result = articleLikeCountRepository.increase(articleId);
@@ -55,6 +57,18 @@ public class ArticleLikeService {
                     ArticleLikeCount.init(articleId, 1L)
             );
         }
+
+        outboxEventPublisher.publish(
+                EventType.ARTICLE_LIKED,
+                ArticleLikedEventPayload.builder()
+                        .articleLikeId(articleLike.getArticleLikeId())
+                        .articleId(articleLike.getArticleId())
+                        .userId(articleLike.getUserId())
+                        .createdAt(articleLike.getCreatedAt())
+                        .articleLikeCount(count(articleLike.getArticleId()))
+                        .build(),
+                articleLike.getArticleId()
+        );
     }
 
     /*
@@ -66,6 +80,17 @@ public class ArticleLikeService {
                 .ifPresent(articleLike -> {
                     articleLikeRepository.delete(articleLike);
                     articleLikeCountRepository.decrease(articleId);
+                    outboxEventPublisher.publish(
+                            EventType.ARTICLE_UNLIKED,
+                            ArticleUnlikedEventPayload.builder()
+                                    .articleLikeId(articleLike.getArticleLikeId())
+                                    .articleId(articleLike.getArticleId())
+                                    .userId(articleLike.getUserId())
+                                    .createdAt(articleLike.getCreatedAt())
+                                    .articleLikeCount(count(articleLike.getArticleId()))
+                                    .build(),
+                            articleLike.getArticleId()
+                    );
                 });
     }
 
