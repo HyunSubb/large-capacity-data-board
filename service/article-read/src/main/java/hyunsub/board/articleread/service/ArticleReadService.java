@@ -52,12 +52,14 @@ public class ArticleReadService {
     }
 
     private Optional<ArticleQueryModel> fetch(Long articleId) {
+        // article 서비스에서 article 가져오기
         Optional<ArticleQueryModel> articleQueryModelOptional = articleClient.read(articleId)
                 .map(article -> ArticleQueryModel.create(
                         article,
                         commentClient.count(articleId),
                         likeClient.count(articleId)
                 ));
+        // article을 redis에 저장하기
         articleQueryModelOptional
                 .ifPresent(articleQueryModel -> articleQueryModelRepository.create(articleQueryModel, Duration.ofDays(1)));
         log.info("[ArticleReadService.fetch] fetch data. articleId={}, isPresent={}", articleId, articleQueryModelOptional.isPresent());
