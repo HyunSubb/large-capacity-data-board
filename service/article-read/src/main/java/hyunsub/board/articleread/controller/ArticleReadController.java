@@ -1,6 +1,7 @@
 package hyunsub.board.articleread.controller;
 
 import hyunsub.board.articleread.service.ArticleReadService;
+import hyunsub.board.articleread.service.response.ArticleReadPageResponse;
 import hyunsub.board.articleread.service.response.ArticleReadResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,4 +21,12 @@ public class ArticleReadController {
         return articleReadService.read(articleId);
     }
 
+    @GetMapping("/v1/articles")
+    public ArticleReadPageResponse readAll(
+            @RequestParam("boardId") Long boardId,
+            @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize
+    ) {
+        return articleReadService.readAll(boardId, page, pageSize);
+    }
 }

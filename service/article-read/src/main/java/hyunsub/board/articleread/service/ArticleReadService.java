@@ -4,9 +4,12 @@ import hyunsub.board.articleread.client.ArticleClient;
 import hyunsub.board.articleread.client.CommentClient;
 import hyunsub.board.articleread.client.LikeClient;
 import hyunsub.board.articleread.client.ViewClient;
+import hyunsub.board.articleread.repository.ArticleIdListRepository;
 import hyunsub.board.articleread.repository.ArticleQueryModel;
 import hyunsub.board.articleread.repository.ArticleQueryModelRepository;
+import hyunsub.board.articleread.repository.BoardArticleCountRepository;
 import hyunsub.board.articleread.service.event.handler.EventHandler;
+import hyunsub.board.articleread.service.response.ArticleReadPageResponse;
 import hyunsub.board.articleread.service.response.ArticleReadResponse;
 import hyunsub.board.hyunsub.event.Event;
 import hyunsub.board.hyunsub.event.EventPayload;
@@ -28,7 +31,9 @@ public class ArticleReadService {
     private final CommentClient commentClient;
     private final LikeClient likeClient;
     private final ViewClient viewClient;
+    private final ArticleIdListRepository articleIdListRepository;
     private final ArticleQueryModelRepository articleQueryModelRepository; // 여기에 Article들이 저장되어 있을 거다.
+    private final BoardArticleCountRepository boardArticleCountRepository;
     private final List<EventHandler> eventHandlers;
 
 
@@ -66,6 +71,15 @@ public class ArticleReadService {
         return articleQueryModelOptional;
     }
 
+    public ArticleReadPageResponse readAll(Long boardId, Long page, Long pageSize) {
+        return ArticleReadPageResponse.of(
+                readAll(
+                        readAllArticleIds(boardId, page, pageSize)
+                ),
+                count(boardId)
+        );
+    }
+
 
     private List<ArticleReadResponse> readAll(List<Long> articleIds) {
         Map<Long, ArticleQueryModel> articleQueryModelMap = articleQueryModelRepository.readAll(articleIds);
@@ -80,6 +94,28 @@ public class ArticleReadService {
                                 viewClient.count(articleQueryModel.getArticleId())
                         ))
                 .toList();
+    }
+
+    private List<Long> readAllArticleIds(Long boardId, Long page, Long pageSize) {
+        List<Long> articleIds = articleIdListRepository.readAll(boardId, (page - 1) * pageSize, pageSize);
+        if (pageSize == articleIds.size()) {
+            log.info("[ArticleReadService.readAllArticleIds] return redis data.");
+            return articleIds;
+        }
+        log.info("[ArticleReadService.readAllArticleIds] return origin data.");
+        return articleClient.readAll(boardId, page, pageSize).getArticles().stream()
+                .map(ArticleClient.ArticleResponse::getArticleId)
+                .toList();
+    }
+
+    private long count(Long boardId) {
+        Long result = boardArticleCountRepository.read(boardId);
+        if (result != null) {
+            return result;
+        }
+        long count = articleClient.count(boardId);
+        boardArticleCountRepository.createOrUpdate(boardId, count);
+        return count;
     }
 
 
